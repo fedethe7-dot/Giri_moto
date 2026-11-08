@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>Giri in Moto</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="logo">🏍️ Giri in Moto</div>
+  <div id="stato" class="stato"></div>
+</header>
+
+<div id="map"></div>
+
+<main>
+  <!-- NUOVO GIRO -->
+  <section id="v-giro" class="view attiva">
+    <div class="card">
+      <h2>Nuovo giro</h2>
+      <label>Chilometri <b id="kmVal">150 km</b></label>
+      <input type="range" id="km" min="30" max="500" step="10" value="150">
+      <label>Tempo a disposizione</label>
+      <select id="ore">
+        <option value="0">Nessun limite</option>
+        <option value="1">1 ora</option><option value="1.5">1 ora e mezza</option>
+        <option value="2">2 ore</option><option value="3" selected>3 ore</option>
+        <option value="4">4 ore</option><option value="5">5 ore</option>
+        <option value="6">6 ore</option><option value="8">8 ore</option>
+      </select>
+      <label>Zona</label>
+      <select id="zona"></select>
+      <div class="toggles">
+        <label class="tg"><input type="checkbox" id="noAuto" checked> Evita autostrade</label>
+        <label class="tg"><input type="checkbox" id="ritrovi" checked> Passa dai ritrovi motociclisti</label>
+      </div>
+      <button id="btnProponi" class="big">Proponi giri</button>
+    </div>
+    <div id="proposte"></div>
+  </section>
+
+  <!-- MODIFICA -->
+  <section id="v-modifica" class="view">
+    <div class="card">
+      <h2 id="modTitolo">Modifica giro</h2>
+      <div id="modInfo" class="info"></div>
+      <p class="aiuto">Tocca la mappa per aggiungere una tappa. Trascina i pallini per spostarli. Tocca un pallino per toglierlo.</p>
+      <ol id="tappe" class="tappe"></ol>
+      <div class="riga">
+        <button id="btnGpx" class="big">📥 GPX</button>
+        <button id="btnSalva" class="big sec">💾 Salva</button>
+      </div>
+      <button id="btnIndietro" class="link">← Torna alle proposte</button>
+    </div>
+  </section>
+
+  <!-- RITROVI -->
+  <section id="v-ritrovi" class="view">
+    <div class="card">
+      <h2>Ritrovi e passi</h2>
+      <select id="filtroProv"></select>
+      <button id="btnNuovoRitrovo" class="sec">+ Aggiungi un mio ritrovo (tocca la mappa)</button>
+      <div id="listaRitrovi"></div>
+    </div>
+  </section>
+
+  <!-- SALVATI -->
+  <section id="v-salvati" class="view">
+    <div class="card"><h2>I miei giri</h2><div id="listaSalvati"></div></div>
+  </section>
+
+  <!-- IMPOSTAZIONI -->
+  <section id="v-imp" class="view">
+    <div class="card">
+      <h2>Casa (partenza)</h2>
+      <div id="casaInfo" class="info"></div>
+      <button id="btnGps" class="sec">📍 Usa la mia posizione attuale</button>
+      <button id="btnTapCasa" class="sec">👆 Tocca la mappa per mettere casa</button>
+      <label>Velocità media in moto (km/h, soste comprese)</label>
+      <input type="number" id="velMedia" min="25" max="90" value="50">
+      <p class="aiuto">Serve per stimare quanti km ci stanno nel tempo che hai.</p>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-v="v-giro" class="attiva">🧭<span>Giro</span></button>
+  <button data-v="v-ritrovi">📍<span>Ritrovi</span></button>
+  <button data-v="v-salvati">💾<span>Salvati</span></button>
+  <button data-v="v-imp">⚙️<span>Casa</span></button>
+</nav>
+
+<div id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="pois.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
