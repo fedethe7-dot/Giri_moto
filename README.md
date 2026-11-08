@@ -2,9 +2,10 @@
 
 Web app (PWA) e app Android che propone giri in moto ad anello partendo da casa (la posizione si imposta nell'app e resta solo sul telefono).
 
-- Scegli chilometri, tempo a disposizione e zona (province del Veneto, tutto il Veneto, confine trentino).
+- Scegli chilometri e zona (province del Veneto, tutto il Veneto, confine trentino): il tempo di guida è indicativo, come il navigatore.
 - Propone 3 giri passando dai ritrovi e dai passi frequentati dai motociclisti: si sfogliano scorrendo.
-- Puoi modificare le tappe (tocca la mappa, trascina, riordina) e scaricare il **GPX** per il navigatore.
+- Puoi modificare le tappe (tocca la mappa, scegli tra le tappe sul percorso ordinate per deviazione, trascina, riordina) e scaricare il **GPX** per il navigatore.
+- Nei giri salvati spunti quelli già fatti (con la data) e filtri Da fare / Fatti.
 - Mappa scura o classica, ritrovi personali, giri salvati.
 
 Percorsi calcolati con OSRM (dati OpenStreetMap), mappe Esri (dati OpenStreetMap), libreria Leaflet.

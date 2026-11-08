@@ -232,3 +232,17 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
 @media (min-width:800px){.sheet{border-radius:24px;border-bottom:1px solid var(--line);bottom:calc(var(--tab-h) + 12px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+/* tappe consigliate, giri fatti */
+.small-title{margin:16px 0 4px}
+.small-title h3{margin:0;font-family:var(--f-num);font-weight:800;font-size:21px}
+.link-btn{color:var(--acc-hi);font-weight:600;font-size:15px;padding:6px 2px}
+.item .extra{font-family:var(--f-num);font-weight:700;font-size:18px;color:var(--acc-hi);white-space:nowrap}
+.fatto-sw{margin-top:14px;padding:14px;border-radius:var(--r-s);background:var(--s2);border:1px solid var(--line)}
+.fatto-sw small{display:block;font-size:13px}
+#salFiltro{margin:-2px 0 12px}
+.ck{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--s3);color:var(--mut);border:2px solid var(--line)}
+.ck .ic{width:20px;height:20px;opacity:0}
+.item.done .ck{background:var(--home);border-color:var(--home);color:#04170c}
+.item.done .ck .ic{opacity:1}
+.item.done .body small .ok{color:var(--home);font-weight:600}

@@ -199,13 +199,11 @@ function chips(box, opzioni, valore, onScegli) {
     box.appendChild(b);
   });
 }
-function aggiornaCruscotto() {
-  const km = +$("#km").value, ore = +$("#ore").value;
+function aggiornaCruscotto() { // solo stima indicativa del tempo, come il navigatore
+  const km = +$("#km").value;
   $("#kmVal").textContent = km;
   const r = $("#km"); r.style.setProperty("--p", ((km - r.min) / (r.max - r.min)) * 100 + "%");
-  const max = ore > 0 ? Math.round(ore * cfg.vel) : 0;
-  if (max && km > max) { $("#kmTempo").textContent = `max ${max} km`; $("#kmTempo").nextElementSibling.textContent = `in ${$("#ore").selectedOptions[0].text}`; }
-  else { $("#kmTempo").textContent = durata((km / cfg.vel) * 60); $("#kmTempo").nextElementSibling.textContent = "di guida stimata"; }
+  $("#kmTempo").textContent = "~" + durata((km / cfg.vel) * 60);
 }
 
 // ---------- Generazione proposte ----------
@@ -219,7 +217,7 @@ function poolPerZona(zona, target) {
 
 function combinazioni(pool, target) {
   const viste = new Map();
-  const kMax = Math.min(4, pool.length);
+  const kMax = Math.min(5, pool.length);
   for (let i = 0; i < 4000 && pool.length; i++) {
     const k = 1 + Math.floor(Math.random() * kMax);
     const scelta = [...pool].sort(() => Math.random() - 0.5).slice(0, k);
@@ -251,12 +249,8 @@ function giroLibero(gradi, target) {
 
 async function proponi() {
   const btn = $("#btnProponi");
-  let target = +$("#km").value;
-  const ore = +$("#ore").value, zona = $("#zona").value, noAuto = $("#noAuto").checked, conRitrovi = $("#ritrovi").checked;
-  if (ore > 0 && target > ore * cfg.vel) {
-    target = Math.round(ore * cfg.vel);
-    toast(`In ${$("#ore").selectedOptions[0].text} stanno circa ${target} km: calcolo su quelli.`, 4500);
-  }
+  const target = +$("#km").value;
+  const zona = $("#zona").value, noAuto = $("#noAuto").checked, conRitrovi = $("#ritrovi").checked;
   btn.disabled = true; btn.innerHTML = '<span class="spin"></span><span>Calcolo i giri…</span>';
   $("#proposte").innerHTML = ""; $("#dots").innerHTML = "";
   proposte = []; selIdx = -1;
@@ -307,7 +301,7 @@ function mostraProposte() {
     const nomiTappe = p.tappe.filter((t) => !t.libero).map((t) => t.n.split(" (")[0].split(" – ")[0]);
     d.innerHTML = `<span class="n">${i + 1}</span>
       <h3>${esc(p.nome)}</h3>
-      <div class="nums"><div><span class="num-l">${Math.round(p.km)}</span><small>km</small></div><div><span class="num-l">${durata(p.min)}</span></div></div>
+      <div class="nums"><div><span class="num-l">${Math.round(p.km)}</span><small>km</small></div><div><span class="num-l">~${durata(p.min)}</span></div></div>
       <div class="via">${nomiTappe.length ? nomiTappe.map((n) => `<span>${esc(n)}</span>`).join("") : "<span>Anello libero, senza tappe fisse</span>"}</div>
       ${p.avviso ? `<div class="warn">${esc(p.avviso)}</div>` : ""}
       <div class="acts"><button class="btn-sec" data-a="mod">${ic("pencil")}Modifica</button><button class="btn-sec" data-a="gpx">${ic("download")}GPX</button></div>`;
@@ -343,7 +337,7 @@ function selezionaProposta(i) {
 
 // ---------- Modifica ----------
 function apriModifica(g) {
-  corrente = g;
+  corrente = g; apriSugg(false);
   vai("v-modifica");
   disegnaPoi();
   renderModifica(true);
@@ -351,7 +345,7 @@ function apriModifica(g) {
 function renderModifica(fit = false) {
   const g = corrente; if (!g) return;
   $("#modTitolo").textContent = g.nome || "Il mio giro";
-  $("#modStats").innerHTML = [[g.km ? Math.round(g.km) : "–", "km"], [g.km ? durata(g.min) : "–", "di guida"], [g.tappe.length, g.tappe.length === 1 ? "tappa" : "tappe"]]
+  $("#modStats").innerHTML = [[g.km ? Math.round(g.km) : "–", "km"], [g.km ? durata(g.min) : "–", "di guida, circa"], [g.tappe.length, g.tappe.length === 1 ? "tappa" : "tappe"]]
     .map(([v, t]) => `<div class="stat"><span class="num-l">${v}</span><small>${t}</small></div>`).join("");
   $("#modInfo").classList.toggle("hidden", !g.avviso && !!g.tappe.length);
   $("#modInfo").textContent = !g.tappe.length ? "Aggiungi almeno una tappa toccando la mappa." : g.avviso || "";
@@ -373,6 +367,10 @@ function renderModifica(fit = false) {
     ol.appendChild(li);
   });
   ol.insertAdjacentHTML("beforeend", casaLi("arrivo"));
+  if (!$("#suggBox").classList.contains("hidden")) renderSugg();
+  const rec = g.id && salvati.find((x) => x.id === g.id);
+  $("#fattoSw").classList.toggle("hidden", !rec);
+  if (rec) { $("#fattoCk").checked = !!rec.fatto; $("#fattoData").textContent = rec.fatto && rec.fattoIl ? "il " + new Date(rec.fattoIl).toLocaleDateString("it-IT") : "spunta quando l'hai percorso"; }
   disegnaGiro(g, fit);
   lyTappe.clearLayers();
   g.tappe.forEach((t, i) => {
@@ -408,6 +406,31 @@ function inserisciTappa(t) {
   }
   g.tappe.splice(best, 0, t);
   ricalcola();
+}
+function renderSugg() {
+  const g = corrente; if (!g) return;
+  const base = stima(g.tappe), usate = new Set(g.tappe.map((t) => t.n));
+  const lista = tuttiPoi().filter((p) => !usate.has(p.n)).map((p) => {
+    let best = Infinity;
+    for (let i = 0; i <= g.tappe.length; i++) best = Math.min(best, stima([...g.tappe.slice(0, i), p, ...g.tappe.slice(i)]));
+    return { ...p, extra: best - base };
+  }).sort((a, b) => a.extra - b.extra).slice(0, 15);
+  const box = $("#suggLista"); box.innerHTML = "";
+  lista.forEach((p) => {
+    const [icona, nomeTipo] = p.mio ? ["flag", "Mio ritrovo"] : TIPO[p.t] || ["map-pin", ""];
+    const d = document.createElement("div"); d.className = "item";
+    d.innerHTML = `<span class="type ${p.mio ? "ritrovo" : p.t}">${ic(icona)}</span>
+      <div class="body"><b>${esc(p.n)}</b><small>${esc(p.note || nomeTipo)}</small></div>
+      <span class="extra">+${Math.max(0, Math.round(p.extra))} km</span>
+      <div class="btns"><button class="go" data-a="agg" aria-label="Aggiungi">${ic("plus")}</button></div>`;
+    d.onclick = () => { inserisciTappa({ n: p.n, lat: p.lat, lon: p.lon }); toast("Aggiunta: " + p.n); };
+    box.appendChild(d);
+  });
+}
+function apriSugg(si) {
+  $("#suggBox").classList.toggle("hidden", !si);
+  $("#btnAggTappa").classList.toggle("hidden", si);
+  if (si) { renderSugg(); setSheet("high"); $("#suggBox").scrollIntoView({ behavior: "smooth", block: "start" }); }
 }
 function usaPoi(p) {
   const t = { n: p.n, lat: p.lat, lon: p.lon };
@@ -490,24 +513,38 @@ async function salva() {
   const r = await chiedi({ titolo: "Salva il giro", valore: corrente.nome || "", segnaposto: "Nome del giro", ok: "Salva" });
   if (!r) return;
   corrente.nome = r.a || corrente.nome;
-  const rec = { ...structuredClone(corrente), id: corrente.id || Date.now(), data: new Date().toISOString() };
+  const prima = salvati.find((x) => x.id === corrente.id);
+  const rec = { ...structuredClone(corrente), id: corrente.id || Date.now(), data: new Date().toISOString(), fatto: prima?.fatto || false, fattoIl: prima?.fattoIl || null };
   salvati = salvati.filter((s) => s.id !== rec.id); salvati.unshift(rec); corrente.id = rec.id;
   LS.set("gm_giri", salvati); renderSalvati(); renderModifica(); toast("Giro salvato");
+}
+let filtroSal = "TUTTI";
+function segnaFatto(id, si) {
+  const rec = salvati.find((x) => x.id === id); if (!rec) return;
+  rec.fatto = si; rec.fattoIl = si ? new Date().toISOString() : null;
+  LS.set("gm_giri", salvati); renderSalvati();
+  if (corrente && corrente.id === id) renderModifica();
+  toast(si ? "Segnato come fatto" : "Segnato da fare");
 }
 const vuoto = (icona, testo) => `<div class="empty">${ic(icona)}<div>${testo}</div></div>`;
 function renderSalvati() {
   const box = $("#listaSalvati");
-  $("#salCount").textContent = salvati.length ? `${salvati.length} ${salvati.length === 1 ? "giro" : "giri"}` : "";
+  const nFatti = salvati.filter((g) => g.fatto).length;
+  $("#salCount").textContent = salvati.length ? `${salvati.length} ${salvati.length === 1 ? "giro" : "giri"} · ${nFatti} ${nFatti === 1 ? "fatto" : "fatti"}` : "";
+  $("#salFiltro").classList.toggle("hidden", !salvati.length);
   if (!salvati.length) { box.innerHTML = vuoto("bookmark", "Nessun giro salvato.<br>Apri una proposta, sistemala e premi Salva."); return; }
-  box.innerHTML = "";
-  salvati.forEach((g) => {
-    const d = document.createElement("div"); d.className = "item";
-    d.innerHTML = `<span class="type ritrovo">${ic("route")}</span>
-      <div class="body"><b>${esc(g.nome)}</b><small>${Math.round(g.km)} km · ${durata(g.min)} · ${new Date(g.data).toLocaleDateString("it-IT")}</small></div>
+  const lista = salvati.filter((g) => filtroSal === "TUTTI" || (filtroSal === "FATTI") === !!g.fatto);
+  box.innerHTML = lista.length ? "" : vuoto("flag", filtroSal === "FATTI" ? "Nessun giro ancora fatto." : "Li hai fatti tutti!");
+  lista.forEach((g) => {
+    const d = document.createElement("div"); d.className = "item" + (g.fatto ? " done" : "");
+    const quando = g.fatto ? `<span class="ok">fatto${g.fattoIl ? " il " + new Date(g.fattoIl).toLocaleDateString("it-IT") : ""}</span>` : "da fare";
+    d.innerHTML = `<button class="ck" data-a="fatto" aria-label="${g.fatto ? "Segna da fare" : "Segna come fatto"}">${ic("check")}</button>
+      <div class="body"><b>${esc(g.nome)}</b><small>${Math.round(g.km)} km · ~${durata(g.min)} · ${quando}</small></div>
       <div class="btns"><button data-a="gpx" aria-label="GPX">${ic("download")}</button><button data-a="del" aria-label="Elimina">${ic("trash-2")}</button><button class="go" data-a="apri">Apri</button></div>`;
     d.onclick = async (e) => {
       const a = e.target.closest("[data-a]")?.dataset.a;
-      if (a === "gpx") scaricaGpx(g);
+      if (a === "fatto") segnaFatto(g.id, !g.fatto);
+      else if (a === "gpx") scaricaGpx(g);
       else if (a === "del") { if (await conferma("Eliminare il giro?", g.nome)) { salvati = salvati.filter((s) => s.id !== g.id); LS.set("gm_giri", salvati); renderSalvati(); } }
       else if (a === "apri") apriModifica(structuredClone(g));
       else { disegnaGiro(g); lyTappe.clearLayers(); }
@@ -586,8 +623,6 @@ function esciModifica() {
 // ---------- Avvio ----------
 Object.entries(ZONE).forEach(([k, z]) => $("#zona").add(new Option(z.n, k)));
 chips($("#zonaChips"), Object.keys(ZONE).map((k) => [k, ZONA_BREVE[k] || ZONE[k].n]), $("#zona").value, (v) => { $("#zona").value = v; });
-chips($("#oreChips"), [...$("#ore").options].map((o) => [o.value, o.value === "0" ? "Libero" : o.value.replace(".5", " h 30").replace(/^(\d+)$/, "$1 h")]), $("#ore").value,
-  (v) => { $("#ore").value = v; aggiornaCruscotto(); });
 $("#filtroProv").add(new Option("Tutte", "TUTTI"));
 Object.entries(ZONE).filter(([k]) => ZONE[k].c).forEach(([k]) => $("#filtroProv").add(new Option(ZONA_BREVE[k], k)));
 $("#filtroProv").add(new Option("I miei", "MIEI"));
@@ -598,6 +633,10 @@ $("#btnProponi").onclick = proponi;
 $("#btnGpx").onclick = () => scaricaGpx(corrente);
 $("#btnSalva").onclick = salva;
 $("#btnRinomina").onclick = rinomina;
+$("#btnAggTappa").onclick = () => apriSugg(true);
+$("#suggChiudi").onclick = () => apriSugg(false);
+$("#fattoCk").onchange = (e) => corrente?.id && segnaFatto(corrente.id, e.target.checked);
+chips($("#salFiltro"), [["TUTTI", "Tutti"], ["DAFARE", "Da fare"], ["FATTI", "Fatti"]], "TUTTI", (v) => { filtroSal = v; renderSalvati(); });
 $("#btnIndietro").onclick = esciModifica;
 $("#btnNuovoRitrovo").onclick = () => { modoTap = "ritrovo"; setSheet("low"); toast("Tocca la mappa dove si trova il ritrovo", 5000); };
 $("#btnTapCasa").onclick = scegliCasaSullaMappa;
