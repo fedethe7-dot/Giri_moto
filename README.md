@@ -7,5 +7,5 @@ Web app (PWA) e app Android che propone giri in moto ad anello partendo da casa 
 - Puoi modificare le tappe (tocca la mappa, trascina, riordina) e scaricare il **GPX** per il navigatore.
 - Mappa scura o classica, ritrovi personali, giri salvati.
 
-Percorsi calcolati con OSRM (dati OpenStreetMap), mappe OpenStreetMap / CARTO, libreria Leaflet.
+Percorsi calcolati con OSRM (dati OpenStreetMap), mappe Esri (dati OpenStreetMap), libreria Leaflet.
 Font Barlow (SIL OFL), icone Lucide (ISC).

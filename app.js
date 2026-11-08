@@ -132,10 +132,15 @@ async function calcola(tappe, noAuto) {
     return j.routes[0];
   };
   let rt, avviso = "";
-  try { rt = await prova(base + (noAuto ? "&exclude=motorway" : "")); }
-  catch (e) {
-    if (!noAuto) throw e;
-    rt = await prova(base); avviso = "Il server non ha potuto escludere le autostrade: controlla il percorso.";
+  const AVVISO_AUTO = "Il server gratuito non sa evitare le autostrade: controlla il percorso.";
+  if (noAuto && calcola.noExclude) { rt = await prova(base); avviso = AVVISO_AUTO; }
+  else {
+    try { rt = await prova(base + (noAuto ? "&exclude=motorway" : "")); }
+    catch (e) {
+      if (!noAuto) throw e;
+      calcola.noExclude = /exclude/i.test(e.message); // il server non lo supporta: non ci riprovo
+      rt = await prova(base); avviso = AVVISO_AUTO;
+    }
   }
   // tempo in moto: OSRM è tarato sulle auto, aggiungo un 10% per curve e tornanti
   return { geo: rt.geometry.coordinates.map(([lo, la]) => [la, lo]), km: rt.distance / 1000, min: (rt.duration / 60) * 1.1, avviso };
@@ -143,13 +148,19 @@ async function calcola(tappe, noAuto) {
 
 // ---------- Mappa ----------
 const map = L.map("map", { zoomControl: false, attributionControl: true }).setView([cfg.casa.lat, cfg.casa.lon], 9);
-const TILES = {
-  dark: L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, subdomains: "abcd", attribution: "© OpenStreetMap © CARTO" }),
-  light: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "© OpenStreetMap" }),
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const ATTR_ESRI = "Mappa © Esri · dati © OpenStreetMap, HERE, Garmin";
+const TILES = { // servizi senza chiave: funzionano anche dentro l'app Android
+  dark: L.layerGroup([
+    L.tileLayer(ESRI + "Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, attribution: ATTR_ESRI }),
+    L.tileLayer(ESRI + "Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16 }),
+  ]),
+  light: L.tileLayer(ESRI + "World_Street_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: ATTR_ESRI }),
 };
 let tiles = TILES[cfg.mappa].addTo(map);
 function stileMappa(s) {
   map.removeLayer(tiles); tiles = TILES[s].addTo(map); cfg.mappa = s; LS.set("gm_cfg", cfg);
+  map.setMaxZoom(s === "dark" ? 16 : 19);
   document.querySelectorAll("#mapStyle button").forEach((b) => b.classList.toggle("on", b.dataset.s === s));
 }
 const icona = (cls, html = "") => L.divIcon({ className: "", html: `<div class="pin ${cls}">${html}</div>`, iconSize: [30, 30], iconAnchor: [15, 15] });

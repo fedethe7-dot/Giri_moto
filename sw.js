@@ -1,5 +1,5 @@
 // Aumenta la versione a ogni aggiornamento, così il telefono scarica i file nuovi
-const CACHE = "giri-moto-v3";
+const CACHE = "giri-moto-v5";
 const FILES = ["./", "index.html", "style.css", "app.js", "pois.js", "manifest.json", "icon.svg",
   "lib/leaflet.js", "lib/leaflet.css",
   "fonts/barlow-latin-400-normal.woff2", "fonts/barlow-latin-500-normal.woff2", "fonts/barlow-latin-600-normal.woff2",
