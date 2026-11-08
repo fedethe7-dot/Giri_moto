@@ -3,101 +3,179 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0d12">
+<meta name="theme-color" content="#08090b">
 <title>Giri in Moto</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="lib/leaflet.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <div class="logo">🏍️ Giri in Moto</div>
-  <div id="stato" class="stato"></div>
-</header>
+<!--SPRITE--><svg xmlns="http://www.w3.org/2000/svg" style="display:none"><!-- Icone Lucide (ISC) --><symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol><symbol id="i-locate-fixed" viewBox="0 0 24 24"><line x1="2" x2="5" y1="12" y2="12" /> <line x1="19" x2="22" y1="12" y2="12" /> <line x1="12" x2="12" y1="2" y2="5" /> <line x1="12" x2="12" y1="19" y2="22" /> <circle cx="12" cy="12" r="7" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-locate" viewBox="0 0 24 24"><line x1="2" x2="5" y1="12" y2="12" /> <line x1="19" x2="22" y1="12" y2="12" /> <line x1="12" x2="12" y1="2" y2="5" /> <line x1="12" x2="12" y1="19" y2="22" /> <circle cx="12" cy="12" r="7" /></symbol><symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3" /> <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /> <circle cx="18" cy="5" r="3" /></symbol><symbol id="i-map" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /> <path d="M15 5.764v15" /> <path d="M9 3.236v15" /></symbol><symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /> <path d="m15 5 4 4" /></symbol><symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7" /> <path d="M19 12H5" /></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 16v-4" /> <path d="M12 8h.01" /></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol><symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" /></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol><symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></symbol><symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4" /> <path d="M3.34 19a10 10 0 1 1 17.32 0" /></symbol><symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" /> <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" /> <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" /></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-coffee" viewBox="0 0 24 24"><path d="M10 2v2" /> <path d="M14 2v2" /> <path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" /> <path d="M6 2v2" /></symbol><symbol id="i-settings-2" viewBox="0 0 24 24"><path d="M20 7h-9" /> <path d="M14 17H5" /> <circle cx="17" cy="17" r="3" /> <circle cx="7" cy="7" r="3" /></symbol><symbol id="i-mountain-snow" viewBox="0 0 24 24"><path d="m8 3 4 8 5-5 5 15H2L8 3z" /> <path d="M4.14 15.08c2.62-1.57 5.24-1.43 7.86.42 2.74 1.94 5.49 2 8.23.19" /></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M3 6h18" /> <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /> <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol><symbol id="i-chevron-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6" /></symbol><symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol><symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /> <line x1="4" x2="4" y1="22" y2="15" /></symbol><symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol></svg><!--/SPRITE-->
 
 <div id="map"></div>
 
-<main>
-  <!-- NUOVO GIRO -->
-  <section id="v-giro" class="view attiva">
-    <div class="card">
-      <h2>Nuovo giro</h2>
-      <label>Chilometri <b id="kmVal">150 km</b></label>
-      <input type="range" id="km" min="30" max="500" step="10" value="150">
-      <label>Tempo a disposizione</label>
-      <select id="ore">
-        <option value="0">Nessun limite</option>
-        <option value="1">1 ora</option><option value="1.5">1 ora e mezza</option>
-        <option value="2">2 ore</option><option value="3" selected>3 ore</option>
-        <option value="4">4 ore</option><option value="5">5 ore</option>
-        <option value="6">6 ore</option><option value="8">8 ore</option>
-      </select>
-      <label>Zona</label>
-      <select id="zona"></select>
-      <div class="toggles">
-        <label class="tg"><input type="checkbox" id="noAuto" checked> Evita autostrade</label>
-        <label class="tg"><input type="checkbox" id="ritrovi" checked> Passa dai ritrovi motociclisti</label>
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 24c5-13 10-2 14-10s7-6 10-4" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><circle cx="4" cy="24" r="2.8" fill="var(--home)"/></svg>
+    <span>Giri <b>in moto</b></span>
+  </div>
+  <button id="chipCasa" class="chip-casa" aria-label="Posizione di casa">
+    <svg class="ic"><use href="#i-house"/></svg><span id="stato">Casa</span>
+  </button>
+</header>
+
+<div class="map-tools">
+  <button id="btnCentra" class="fab" aria-label="Centra sulla mappa"><svg class="ic"><use href="#i-locate-fixed"/></svg></button>
+</div>
+
+<section id="sheet" class="sheet" data-pos="mid" aria-label="Pannello">
+  <div class="grab" id="grab"><span></span></div>
+  <div class="sheet-body" id="sheetBody">
+
+    <!-- NUOVO GIRO -->
+    <section id="v-giro" class="view attiva">
+      <div class="dash">
+        <div class="dash-row">
+          <div class="dash-km"><span id="kmVal" class="num-xl">150</span><span class="unit">km</span></div>
+          <div class="dash-side">
+            <span class="num-m" id="kmTempo">3 h 00</span>
+            <span class="muted">circa, come il navigatore</span>
+          </div>
+        </div>
+        <input type="range" id="km" min="30" max="500" step="10" value="150" aria-label="Chilometri">
+        <div class="scale"><span>30</span><span>150</span><span>300</span><span>500</span></div>
       </div>
-      <button id="btnProponi" class="big">Proponi giri</button>
-    </div>
-    <div id="proposte"></div>
-  </section>
 
-  <!-- MODIFICA -->
-  <section id="v-modifica" class="view">
-    <div class="card">
-      <h2 id="modTitolo">Modifica giro</h2>
-      <div id="modInfo" class="info"></div>
-      <p class="aiuto">Tocca la mappa per aggiungere una tappa. Trascina i pallini per spostarli. Tocca un pallino per toglierlo.</p>
-      <ol id="tappe" class="tappe"></ol>
-      <div class="riga">
-        <button id="btnGpx" class="big">📥 GPX</button>
-        <button id="btnSalva" class="big sec">💾 Salva</button>
+      <div class="field">
+        <div class="lbl"><svg class="ic"><use href="#i-map"/></svg>Dove</div>
+        <div class="chips" id="zonaChips"></div>
       </div>
-      <button id="btnIndietro" class="link">← Torna alle proposte</button>
-    </div>
-  </section>
+      <div class="switches">
+        <label class="sw"><input type="checkbox" id="noAuto" checked><span class="track"></span>Evita autostrade</label>
+        <label class="sw"><input type="checkbox" id="ritrovi" checked><span class="track"></span>Passa dai ritrovi</label>
+      </div>
 
-  <!-- RITROVI -->
-  <section id="v-ritrovi" class="view">
-    <div class="card">
-      <h2>Ritrovi e passi</h2>
-      <select id="filtroProv"></select>
-      <button id="btnNuovoRitrovo" class="sec">+ Aggiungi un mio ritrovo (tocca la mappa)</button>
-      <div id="listaRitrovi"></div>
-    </div>
-  </section>
+      <!-- valori letti dalla logica di calcolo -->
+      <select id="zona" hidden></select>
 
-  <!-- SALVATI -->
-  <section id="v-salvati" class="view">
-    <div class="card"><h2>I miei giri</h2><div id="listaSalvati"></div></div>
-  </section>
+      <button id="btnProponi" class="cta"><span>Proponi giri</span><svg class="ic"><use href="#i-route"/></svg></button>
 
-  <!-- IMPOSTAZIONI -->
-  <section id="v-imp" class="view">
-    <div class="card">
-      <h2>Casa (partenza)</h2>
-      <div id="casaInfo" class="info"></div>
-      <button id="btnGps" class="sec">📍 Usa la mia posizione attuale</button>
-      <button id="btnTapCasa" class="sec">👆 Tocca la mappa per mettere casa</button>
-      <label>Velocità media in moto (km/h, soste comprese)</label>
-      <input type="number" id="velMedia" min="25" max="90" value="50">
-      <p class="aiuto">Serve per stimare quanti km ci stanno nel tempo che hai.</p>
-    </div>
-  </section>
-</main>
+      <div id="proposteWrap" class="hidden">
+        <div class="sec-title"><h2>Le proposte</h2><span class="muted" id="propHint">scorri per vederle</span></div>
+        <div id="proposte" class="carousel"></div>
+        <div class="dots" id="dots"></div>
+      </div>
+    </section>
 
-<nav>
-  <button data-v="v-giro" class="attiva">🧭<span>Giro</span></button>
-  <button data-v="v-ritrovi">📍<span>Ritrovi</span></button>
-  <button data-v="v-salvati">💾<span>Salvati</span></button>
-  <button data-v="v-imp">⚙️<span>Casa</span></button>
+    <!-- MODIFICA -->
+    <section id="v-modifica" class="view">
+      <div class="view-head">
+        <button id="btnIndietro" class="icon-btn" aria-label="Indietro"><svg class="ic"><use href="#i-arrow-left"/></svg></button>
+        <h2 id="modTitolo">Modifica giro</h2>
+        <button id="btnRinomina" class="icon-btn" aria-label="Rinomina"><svg class="ic"><use href="#i-pencil"/></svg></button>
+      </div>
+      <div class="stats" id="modStats"></div>
+      <div id="modInfo" class="note hidden"></div>
+      <p class="aiuto"><svg class="ic"><use href="#i-info"/></svg>Tocca la mappa per aggiungere una tappa, trascina i numeri per spostarle.</p>
+      <ol id="tappe" class="timeline"></ol>
+      <button id="btnAggTappa" class="btn-sec wide"><svg class="ic"><use href="#i-plus"/></svg>Aggiungi una tappa</button>
+      <div id="suggBox" class="hidden">
+        <div class="sec-title small-title"><h3>Tappe sul percorso</h3><button id="suggChiudi" class="link-btn">Chiudi</button></div>
+        <p class="aiuto"><svg class="ic"><use href="#i-info"/></svg>Ordinate per deviazione: tocca per aggiungerle. Puoi anche toccare un punto sulla mappa.</p>
+        <div id="suggLista" class="list"></div>
+      </div>
+      <label class="sw fatto-sw hidden" id="fattoSw"><input type="checkbox" id="fattoCk"><span class="track"></span><span>Giro già fatto <small class="muted" id="fattoData"></small></span></label>
+      <div class="actions">
+        <button id="btnGpx" class="cta"><span>Scarica GPX</span><svg class="ic"><use href="#i-download"/></svg></button>
+        <button id="btnSalva" class="btn-sec"><svg class="ic"><use href="#i-bookmark"/></svg>Salva</button>
+      </div>
+    </section>
+
+    <!-- RITROVI -->
+    <section id="v-ritrovi" class="view">
+      <div class="sec-title"><h2>Ritrovi e passi</h2><span class="muted" id="ritCount"></span></div>
+      <div class="chips scroll" id="filtroChips"></div>
+      <select id="filtroProv" hidden></select>
+      <button id="btnNuovoRitrovo" class="btn-sec wide"><svg class="ic"><use href="#i-plus"/></svg>Aggiungi un mio ritrovo</button>
+      <div id="listaRitrovi" class="list"></div>
+    </section>
+
+    <!-- SALVATI -->
+    <section id="v-salvati" class="view">
+      <div class="sec-title"><h2>I miei giri</h2><span class="muted" id="salCount"></span></div>
+      <div class="chips" id="salFiltro"></div>
+      <div id="listaSalvati" class="list"></div>
+    </section>
+
+    <!-- IMPOSTAZIONI -->
+    <section id="v-imp" class="view">
+      <div class="sec-title"><h2>Impostazioni</h2></div>
+      <div class="group">
+        <div class="group-title"><svg class="ic"><use href="#i-house"/></svg>Partenza (casa)</div>
+        <div id="casaInfo" class="muted"></div>
+        <div class="row2">
+          <button id="btnGps" class="btn-sec"><svg class="ic"><use href="#i-locate"/></svg>Posizione attuale</button>
+          <button id="btnTapCasa" class="btn-sec"><svg class="ic"><use href="#i-map-pin"/></svg>Scegli sulla mappa</button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-title"><svg class="ic"><use href="#i-gauge"/></svg>Velocità media</div>
+        <div class="stepper">
+          <button id="velMeno" class="icon-btn" aria-label="Meno">−</button>
+          <div><span class="num-l" id="velVal">50</span> <span class="muted">km/h</span></div>
+          <button id="velPiu" class="icon-btn" aria-label="Più">+</button>
+        </div>
+        <input type="number" id="velMedia" min="25" max="90" value="50" hidden>
+        <p class="muted small">Soste comprese. Serve a capire quanti km ci stanno nel tempo che hai.</p>
+      </div>
+      <div class="group">
+        <div class="group-title"><svg class="ic"><use href="#i-layers"/></svg>Stile della mappa</div>
+        <div class="seg" id="mapStyle">
+          <button data-s="dark" class="on"><svg class="ic"><use href="#i-moon"/></svg>Scura</button>
+          <button data-s="light"><svg class="ic"><use href="#i-sun"/></svg>Classica</button>
+        </div>
+      </div>
+      <p class="muted small credits">Percorsi: OSRM · Dati: © OpenStreetMap · Mappe: © Esri</p>
+    </section>
+  </div>
+</section>
+
+<nav class="tabbar">
+  <button data-v="v-giro" class="attiva"><svg class="ic"><use href="#i-route"/></svg><span>Giro</span></button>
+  <button data-v="v-ritrovi"><svg class="ic"><use href="#i-coffee"/></svg><span>Ritrovi</span></button>
+  <button data-v="v-salvati"><svg class="ic"><use href="#i-bookmark"/></svg><span>Salvati</span></button>
+  <button data-v="v-imp"><svg class="ic"><use href="#i-settings-2"/></svg><span>Impostazioni</span></button>
 </nav>
 
-<div id="toast"></div>
+<!-- primo avvio -->
+<div id="onboard" class="onboard hidden">
+  <div class="ob-card">
+    <svg class="ob-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 24c5-13 10-2 14-10s7-6 10-4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="4" cy="24" r="2.8" fill="var(--home)"/><circle cx="28" cy="10" r="2.8" fill="#fff"/></svg>
+    <h1>Da dove parti?</h1>
+    <p>Imposta casa una volta sola: i giri partono e tornano lì. La posizione resta solo su questo telefono.</p>
+    <button id="obGps" class="cta"><span>Usa la mia posizione</span><svg class="ic"><use href="#i-locate"/></svg></button>
+    <button id="obMappa" class="btn-sec wide"><svg class="ic"><use href="#i-map-pin"/></svg>La scelgo sulla mappa</button>
+  </div>
+</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- finestra per nomi e conferme -->
+<div id="dialog" class="dialog hidden" role="dialog" aria-modal="true">
+  <div class="dlg-card">
+    <h3 id="dlgTitolo"></h3>
+    <p id="dlgTesto" class="muted"></p>
+    <input id="dlgInput" type="text">
+    <input id="dlgInput2" type="text">
+    <div class="row2">
+      <button id="dlgNo" class="btn-sec">Annulla</button>
+      <button id="dlgOk" class="cta small"><span>OK</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script src="lib/leaflet.js"></script>
 <script src="pois.js"></script>
 <script src="app.js"></script>
 </body>
